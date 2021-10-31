@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <!-- <script src="/index.js"></script> -->
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+
+<body>
+  <div >
+  <h3>To do List</h3>
+  <input id="todoV" type="text" placeholder="請輸入待辦事項">
+  <button onclick="insert()">Send</button>
+<table id="myData"></table>
+</div>
+<div class="pagination">
+  <!-- <a href="#">&laquo;</a> -->
+  <a href="http://127.0.0.1:8080">1</a>
+  <a href="http://127.0.0.1:8080/Page2.html">2</a>
+  <a href="http://127.0.0.1:8080/Page3.html">3</a>
+  <!-- <a href="#">&raquo;</a> -->
+</div>
+
+<script>
+  const uri = 'http://127.0.0.1:8080/get?page=2';
+  const initDetails = {
+      method: 'GET',
+      headers: {
+          "Content-Type": "application/json; charset=utf-8"
+      },
+      mode: "cors"
+  }
+      fetch( uri, initDetails )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+          appendData(data);
+         })
+          .catch( err =>
+          {
+              console.log( 'Fetch Error :-S', err );
+          } );
+  function appendData(data) {
+  var mainContainer = document.getElementById("myData");
+  for (var i = 0; i < data.length; i++) {
+    var tr = document.createElement("tr");
+    tr.innerHTML = `<td width="10%" ><button class="finish" id="${data[i].id}" onclick="finish(this)" value="${data[i].status}">完成</button></td>
+    <td width="30%">${data[i].title} </td> 
+    <td width="10%" ><button id="change" onclick="change(this)" value="${data[i].id}">修改</button></td> 
+    <td width="10%"><button id="del" onclick="del(this)" value="${data[i].id}">刪除</button></td>`;
+    mainContainer.appendChild(tr);
+  }
+}
+// ------------------------------------
+function insert(){
+var chV = document.getElementById('todoV').value
+if (chV === "") {
+window.alert("請勿輸入空值")
+}else{
+  const uri = 'http://127.0.0.1:8080/insert';
+  const initDetails = {
+      method: 'POST',
+      headers: {
+          "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify({"title":chV}),
+      mode: "cors"
+  }
+      fetch( uri, initDetails )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+          appendData(data);
+          // window.alert(JSON.stringify(data.title)+' 新增成功',
+          location.reload()
+         })
+          .catch( err =>
+          {
+              console.log( 'Fetch Error :-S', err );
+          } );
+}
+  // let chV = prompt('請輸入修改值');
+  // let obj = JSON.parse(`{"id":${chId},"title":${chV}}`);
+  // console.log(JSON.stringify(obj));
+}
+// ------------------------------------
+function change(e){
+  let chV = prompt('請輸入修改值');
+  var chId = e.value
+  // console.log(chId,chV);
+  // let obj = JSON.parse(`{"id":${chId},"title":${chV}}`);
+  // console.log(JSON.stringify(obj));
+
+  const uri = `http://127.0.0.1:8080/put/${chId}`;
+  const initDetails = {
+      method: 'PUT',
+      headers: {
+          "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify({"id":chId,"title":chV}),
+      mode: "cors"
+  }
+      fetch( uri, initDetails )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+          appendData(data);
+          window.alert(JSON.stringify(data.title)+'修改成功')
+          window.location.reload()
+         })
+          .catch( err =>
+          {
+              console.log( 'Fetch Error :-S', err );
+          } );
+}
+// ------------------------------------
+function del(e){
+  var chId = e.value
+  const uri = `http://127.0.0.1:8080/del/${chId}`;
+  const initDetails = {
+      method: 'DELETE',
+      headers: {
+          "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify({"id":chId}),
+      mode: "cors"
+  }
+      fetch( uri, initDetails )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+          appendData(data);
+          window.alert(JSON.stringify(data))
+         })
+          .catch( err =>
+          {
+              console.log( 'Fetch Error :-S', err );
+          } );
+}
+// ------------------------------------
+function finish(e){
+  if (e.value =="false"){
+   var a = document.getElementsByClassName('finish').value = "true"
+  }else{
+   var a = document.getElementsByClassName('finish').value = "false"
+  }
+  var chId = e.id
+  const uri = `http://127.0.0.1:8080/put${chId}`;
+  const initDetails = {
+      method: 'PUT',
+      headers: {
+          "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify({"id":chId,"status":a}),
+      mode: "cors"
+  }
+      fetch( uri, initDetails )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+          appendData(data);
+         })
+          .catch( err =>
+          {
+              console.log( 'Fetch Error :-S', err );
+          } );
+}
+// ------------------------------------
+function page2(){
+  const uri = 'http://127.0.0.1:8080/get/2';
+  const initDetails = {
+      method: 'GET',
+      headers: {
+          "Content-Type": "application/json; charset=utf-8"
+      },
+      mode: "cors"
+  }
+      fetch( uri, initDetails )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+          appendData(data);
+         })
+          .catch( err =>
+          {
+              console.log( 'Fetch Error :-S', err );
+          } );
+  function appendData(data) {
+  var mainContainer = document.getElementById("myData");
+  for (var i = 0; i < data.length; i++) {
+    var tr = document.createElement("tr");
+    tr.innerHTML = `<td width="10%" ><button class="finish" id="${data[i].id}" onclick="finish(this)" value="${data[i].status}">完成</button></td>
+    <td width="30%">${data[i].title} </td> 
+    <td width="10%" ><button id="change" onclick="change(this)" value="${data[i].id}">修改</button></td> 
+    <td width="10%"><button id="del" onclick="del(this)" value="${data[i].id}">刪除</button></td>`;
+    mainContainer.appendChild(tr);
+  }
+}
+}
+// ------------------------------------
+
+// ------------------------------------
+</script>
+ 
+</body>
+</html>
